@@ -150,7 +150,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 	var/obj/item/fighter_component/battery/battery = loadout.get_slot(HARDPOINT_SLOT_BATTERY)
 	data["battery"] = battery? battery.active : battery
 
-	data["apu"] = APU.active
+	data["apu"] = APU?.active // AQ EDIT - panel działa po demontażu APU
 	var/obj/item/fighter_component/engine/engine = loadout.get_slot(HARDPOINT_SLOT_ENGINE)
 	data["ignition"] = engine ? engine.active() : FALSE
 	data["rpm"] = engine? engine.rpm : 0
@@ -925,6 +925,8 @@ Been a mess since 2018, we'll fix it someday (probably)
 	return hardpoint_slots[slot]
 
 /datum/component/ship_loadout/proc/install_hardpoint(obj/item/fighter_component/replacement)
+	if(!replacement || !replacement.can_install(holder)) // AQ EDIT - ograniczenia modułów górniczych przed usunięciem starego wyposażenia
+		return FALSE
 	var/slot = replacement.slot
 	if(slot && !(slot in equippable_slots))
 		replacement.visible_message("<span class='warning'>[replacement] nie pasuje do [parent]")
@@ -1402,7 +1404,7 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 			return FALSE
 	if(rpm > 3000)
 		var/obj/item/fighter_component/battery/B = F.loadout.get_slot(HARDPOINT_SLOT_BATTERY)
-		B.give(500  *tier)
+		B?.give(500  *tier) // AQ EDIT - demontaż akumulatora podczas pracy silnika
 	if(!active())
 		return FALSE
 
@@ -1568,6 +1570,8 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 		return //APU needs fuel to drink
 	F.relay('nsv13/sound/effects/fighters/apu_loop.ogg')
 	var/obj/item/fighter_component/engine/engine = F.loadout.get_slot(HARDPOINT_SLOT_ENGINE)
+	if(!engine) // AQ EDIT - APU nie rozkręca wymontowanego silnika
+		return
 	F.use_fuel(2, TRUE) //APUs take fuel to run.
 	if(engine.active())
 		return

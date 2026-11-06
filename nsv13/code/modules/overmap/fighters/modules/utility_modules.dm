@@ -21,8 +21,8 @@
 	var/obj/structure/overmap/small_craft/F = loc
 	if(!istype(F))
 		return FALSE
-	var/obj/item/fighter_component/battery/B = F.loadout.get_slot(HARDPOINT_SLOT_BATTERY)
-	if(!istype(B))
+	var/obj/item/fighter_component/battery/B = F.loadout?.get_slot(HARDPOINT_SLOT_BATTERY)
+	if(!istype(B) || !B.active || !active) // AQ EDIT - przecinak wymaga włączonego zasilania
 		return 0
 	return round(B.charge/charge_to_fire)
 
@@ -30,7 +30,7 @@
 	var/obj/structure/overmap/small_craft/F = loc
 	if(!istype(F))
 		return FALSE
-	var/obj/item/fighter_component/battery/B = F.loadout.get_slot(HARDPOINT_SLOT_BATTERY)
+	var/obj/item/fighter_component/battery/B = F.loadout?.get_slot(HARDPOINT_SLOT_BATTERY)
 	if(!istype(B))
 		return 0
 	return round(B.maxcharge/charge_to_fire)
@@ -39,13 +39,13 @@
 	var/obj/structure/overmap/small_craft/F = loc
 	if(!istype(F))
 		return FALSE
-	var/obj/item/fighter_component/battery/B = F.loadout.get_slot(HARDPOINT_SLOT_BATTERY)
+	var/obj/item/fighter_component/battery/B = F.loadout?.get_slot(HARDPOINT_SLOT_BATTERY)
 
-	if(B.charge < charge_to_fire)
+	if(!B || !B.active || !active || B.charge < charge_to_fire) // AQ EDIT - brak/wyłączenie akumulatora nie pozwala strzelać
 		F.relay('sound/weapons/gun_dry_fire.ogg')
 		return FALSE
 
-	B.charge -= charge_to_fire
+	B.use_power(charge_to_fire) // AQ EDIT - obsłuż wyczerpanie; FALSE oznacza też poprawny ostatni strzał
 	. = projectile
 
 /obj/item/projectile/plasma/adv/sabre

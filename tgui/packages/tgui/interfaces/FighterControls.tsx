@@ -12,6 +12,9 @@ import { useBackend, useLocalState } from '../backend';
 import { Window } from '../layouts';
 
 type Data = {
+  mining_module?: string;
+  mining_active?: boolean;
+  mining_magnet?: boolean;
   apu: any;
   armour_integrity: any;
   battery: any;
@@ -222,6 +225,29 @@ export const FighterControls = (props) => {
             icon="satellite-dish"
             onClick={() => act('show_dradis')}
           />
+          {!!data.mining_module && (
+            <>
+              <Button
+                selected={data.mining_active}
+                onClick={() => act('mining_toggle')}
+              >
+                {data.mining_module}
+              </Button>
+              <Button
+                disabled={!data.mining_active}
+                onClick={() => act('mining_scan')}
+              >
+                Skanuj złoża
+              </Button>
+              <Button
+                disabled={!data.mining_active}
+                selected={data.mining_magnet}
+                onClick={() => act('mining_magnet')}
+              >
+                Magnes
+              </Button>
+            </>
+          )}
           <Button
             width="150px"
             content="Tryb dokowania"

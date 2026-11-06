@@ -41,6 +41,9 @@ The other ~60 same-type redefinitions in `aquila/` call `..()`, so they are alre
 
 | Hook | Location | Feature |
 |---|---|---|
+| `replacement.can_install(holder)` before removing old component | `nsv13/code/modules/overmap/fighters/_fighters.dm` (`install_hardpoint()`) | Restrict optional Mining secondary modules to Sabre Mining. Default accepts existing equipment; implementation in `aquila/code/modules/overmap/sabre_mining.dm`. |
+| Null guards for APU UI, engine battery charging and APU's engine | `nsv13/code/modules/overmap/fighters/_fighters.dm` | Permit equipment removal without dereferencing missing components. No energy rates or default loadouts change. |
+| Battery guards and `use_power()` in existing cutter procs | `nsv13/code/modules/overmap/fighters/modules/utility_modules.dm` (`get_ammo()`, `get_max_ammo()`, `fire()`) | Universal 217-A power fix: disabled/missing batteries cannot fire, the final shot triggers battery depletion. Direct minimal edits avoid duplicate same-type proc definitions. Test: `aquila_plasmacutter_power`. |
 | `get_path_to(...) || list()` | `code/modules/mob/living/simple_animal/bot/medbot.dm` (`handle_automated_action()`) | A medibot without a turf (world shutdown after tests) got a null path and runtimed on `path.len`. |
 | `strip_auto_articles()` on `html` and `text` | `code/modules/tgchat/to_chat.dm` (`to_chat()`, `to_chat_immediate()`) | BYOND inserts an English "the"/"The" before every embedded object with a lowercase name, which broke every Polish message ("To the teczka"). Test: `aquila_auto_articles` |
 | `INVOKE_ASYNC(...)` without `return` in the `COMSIG_PARENT_ATTACKBY` handler | `code/datums/components/construction.dm` (`action()`), `code/game/mecha/mecha_construction_paths.dm` (gygax `action()`) | `INVOKE_ASYNC` returns a `/datum/task` since the 515 compatibility change; `_SendSignal` ORed it into the flags and runtimed on every mech construction click. Test: `aquila_logi_rund_26_10` |
